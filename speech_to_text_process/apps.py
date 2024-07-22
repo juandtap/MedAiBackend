@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class SpeechToTextProccessConfig(AppConfig):
+class SpeechToTextProcessConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'speech_to_text_proccess'
+    name = 'speech_to_text_process'

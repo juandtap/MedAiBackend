@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'brain_tumor_segmentation',
-    'speech_to_text_proccess',
+    'speech_to_text_process',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
