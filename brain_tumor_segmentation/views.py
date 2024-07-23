@@ -1,17 +1,22 @@
 import os.path
-
+import re
 from django.shortcuts import render
+from django.conf import settings
 from rest_framework.decorators import api_view
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
-
+from io import BytesIO
+import matplotlib.pyplot as plt
 from .ml_model.segmentation import ModeloSegmentacion
+from rest_framework.parsers import MultiPartParser
 
 
 @csrf_exempt
 @api_view(['POST'])
 def cargar_imagen(request):
+    parser_classes = [MultiPartParser]
+
     if request.method == 'POST':
         t1c_file = request.FILES.get('t1c_file')
         t2f_file = request.FILES.get('t2f_file')
@@ -19,14 +24,42 @@ def cargar_imagen(request):
         if not t1c_file or not t2f_file:
             return JsonResponse({'error': 'Ambos archivos son necesarios.'}, status=400)
 
-        t1c_path = default_storage.save(t1c_file.name, t1c_file)
-        t2f_path = default_storage.save(t2f_file.name, t2f_file)
+        # Guarda los archivos en una carpeta temporal
+        temp_dir = os.path.join(settings.BASE_DIR, 'brain_tumor_segmentation', 'ml_model', 'temp')
 
-        # se llama al modelo
-        sample_path = os.path.splitext(t1c_path)[0]
-        prediction_image_path = ModeloSegmentacion.obtener_segmentacion(sample_path,
-                                                                        slice_to_plot=20)
-        with open(prediction_image_path, 'rb') as f:
-            return HttpResponse(f.read(), content_type="image/png")
+        os.makedirs(temp_dir, exist_ok=True)
+        t1c_temp_path = os.path.join(temp_dir, t1c_file.name)
+        t2f_temp_path = os.path.join(temp_dir, t2f_file.name)
+
+        with open(t1c_temp_path, 'wb') as f:
+            f.write(t1c_file.read())
+
+        with open(t2f_temp_path, 'wb') as f:
+            f.write(t2f_file.read())
+
+        t1c_filename = re.sub(r'-[^-]+$', '', t1c_file.name)
+        t2f_filename = re.sub(r'-[^-]+$', '', t2f_file.name)
+
+        t1c_final_path = os.path.join(temp_dir, t1c_filename)
+        t2f_final_path = os.path.join(temp_dir, t2f_filename)
+
+        os.rename(t1c_temp_path, t1c_final_path)
+        os.rename(t2f_temp_path, t2f_final_path)
+
+        sample_path = t2f_final_path
+        print(">>> PATH : ", sample_path), " >\n"
+        modelo_seg = ModeloSegmentacion()
+
+        prediction_image = modelo_seg.obtener_segmentacion(sample_path=sample_path, slice_to_plot=20)
+
+        # Convierte la imagen en un archivo PNG
+        image_io = BytesIO()
+        plt.imsave(image_io, prediction_image, format='png')
+        image_io.seek(0)
+
+        response = HttpResponse(image_io, content_type='image/png')
+        response['Content-Disposition'] = 'attachment; filename="prediction.png"'
+
+        return response
 
     return JsonResponse({'error': 'No se enviaron archivos.'}, status=400)
