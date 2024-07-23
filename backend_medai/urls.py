@@ -16,10 +16,10 @@ Including another URLconf
 """
 from brain_tumor_segmentation.views import cargar_imagen
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/subirtomografia', cargar_imagen, name='cargar_imagen'),
+    path('api/subirtomografia', include('brain_tumor_segmentation.urls')),
 
 ]

@@ -28,14 +28,21 @@ from skimage import measure
 
 import plotly.express as px
 
+import cv2
+
 
 class ModeloSegmentacion:
 
     _modelo_cnn_unet = None
     IMG_SIZE = 128
+    VOLUME_START_AT = 60
+    VOLUME_SLICES = 75
+
 
     def __init__(self):
         print("modelo segmentacion creado (debe mostrarse una vez)")
+        self._modelo_cnn_unet = self.cargar_modelo_cnn_unet()
+
 
     # El modelo cnn-unet no se carga directamente lo que se hace es definir la cnn y luego cargar los pesos
     # desde el archivo model-unet-brats.weights.h5
@@ -51,6 +58,48 @@ class ModeloSegmentacion:
         print(modelo.summary())
         return modelo
 
-    def obtener_segmentacion(self):
-        pass
+    @staticmethod
+    def predict_segmentation(self, sample_path):
+        t1ce_path = sample_path + '-t1c.nii.gz'
+        flair_path = sample_path + '-t2f.nii.gz'
+
+        t1ce = nib.load(t1ce_path).get_fdata()
+        flair = nib.load(flair_path).get_fdata()
+
+        X = np.empty((self.VOLUME_SLICES, self.IMG_SIZE, self.IMG_SIZE, 2))
+
+        for j in range(self.VOLUME_SLICES):
+            X[j, :, :, 0] = cv2.resize(flair[:, :, j + self.VOLUME_START_AT], (self.IMG_SIZE, self.IMG_SIZE))
+            X[j, :, :, 1] = cv2.resize(t1ce[:, :, j + self.VOLUME_START_AT], (self.IMG_SIZE, self.IMG_SIZE))
+
+        return self._modelo_cnn_unet.predict(X / np.max(X), verbose=1)
+
+    @staticmethod
+    def obtener_segmentacion(self, sample_path, slice_to_plot):
+        predicted_seg = self.predict_segmentation(sample_path)
+
+        seg_path = sample_path + '-seg.nii.gz'
+        seg = nib.load(seg_path).get_fdata()
+        seg = cv2.resize(seg[:, :, slice_to_plot + self.VOLUME_START_AT], (self.IMG_SIZE, self.IMG_SIZE),
+                         interpolation=cv2.INTER_NEAREST)
+        seg[seg == 0] = np.nan
+
+        my_pred = np.argmax(predicted_seg, axis=3)
+        my_pred = my_pred[slice_to_plot, :, :]
+        my_pred = my_pred.astype(float)
+        my_pred[my_pred == 0] = np.nan
+
+        fig, axstest = plt.subplots(1, 2, figsize=(8, 6))
+        axstest[0].imshow(seg, cmap='gray', norm=None)
+        axstest[0].set_title('Segmentación original')
+        axstest[1].imshow(my_pred, cmap='gray', norm=None)
+        axstest[1].set_title('Predicción sin postprocesamiento (layers 1,2,3)')
+
+        plt.subplots_adjust(wspace=0.8)
+        output_path = f'{sample_path}_prediction.png'
+        plt.savefig(output_path)
+        plt.close()
+        return output_path
+
+
 
