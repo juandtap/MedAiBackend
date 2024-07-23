@@ -28,28 +28,36 @@ def cargar_imagen(request):
         temp_dir = os.path.join(settings.BASE_DIR, 'brain_tumor_segmentation', 'ml_model', 'temp')
 
         os.makedirs(temp_dir, exist_ok=True)
+        print("directorios: >>")
+        print(temp_dir)
+        print(t1c_file.name, t2f_file.name)
         t1c_temp_path = os.path.join(temp_dir, t1c_file.name)
         t2f_temp_path = os.path.join(temp_dir, t2f_file.name)
-
+        print("directorio a guardar")
+        print(t1c_temp_path, t2f_temp_path)
+        print("valor de files: ")
+        print(t1c_file)
+        print(t2f_file)
         with open(t1c_temp_path, 'wb') as f:
             f.write(t1c_file.read())
 
         with open(t2f_temp_path, 'wb') as f:
             f.write(t2f_file.read())
 
-        t1c_filename = re.sub(r'-[^-]+$', '', t1c_file.name)
-        t2f_filename = re.sub(r'-[^-]+$', '', t2f_file.name)
+        #t1c_filename = re.sub(r'-[^-]+$', '', t1c_file.name)
+        #t2f_filename = re.sub(r'-[^-]+$', '', t2f_file.name)
 
-        t1c_final_path = os.path.join(temp_dir, t1c_filename)
-        t2f_final_path = os.path.join(temp_dir, t2f_filename)
+        #t1c_final_path = os.path.join(temp_dir, t1c_filename)
+        #t2f_final_path = os.path.join(temp_dir, t2f_filename)
 
-        os.rename(t1c_temp_path, t1c_final_path)
-        os.rename(t2f_temp_path, t2f_final_path)
+        #os.rename(t1c_temp_path, t1c_final_path)
+        #os.rename(t2f_temp_path, t2f_final_path)
 
-        sample_path = t2f_final_path
-        print(">>> PATH : ", sample_path), " >\n"
+        #sample_path = t2f_final_path
+
         modelo_seg = ModeloSegmentacion()
-
+        sample_path = re.sub(r'-[^-]+$', '', t1c_temp_path)
+        print(">>>SAMPLE PATH : ", sample_path, " >>> \n")
         prediction_image = modelo_seg.obtener_segmentacion(sample_path=sample_path, slice_to_plot=20)
 
         # Convierte la imagen en un archivo PNG
