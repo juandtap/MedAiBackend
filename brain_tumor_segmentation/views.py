@@ -44,16 +44,6 @@ def cargar_imagen(request):
         with open(t2f_temp_path, 'wb') as f:
             f.write(t2f_file.read())
 
-        #t1c_filename = re.sub(r'-[^-]+$', '', t1c_file.name)
-        #t2f_filename = re.sub(r'-[^-]+$', '', t2f_file.name)
-
-        #t1c_final_path = os.path.join(temp_dir, t1c_filename)
-        #t2f_final_path = os.path.join(temp_dir, t2f_filename)
-
-        #os.rename(t1c_temp_path, t1c_final_path)
-        #os.rename(t2f_temp_path, t2f_final_path)
-
-        #sample_path = t2f_final_path
 
         modelo_seg = ModeloSegmentacion()
         sample_path = re.sub(r'-[^-]+$', '', t1c_temp_path)
