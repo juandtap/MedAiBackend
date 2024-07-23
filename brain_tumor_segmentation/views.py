@@ -59,15 +59,13 @@ def cargar_imagen(request):
         sample_path = re.sub(r'-[^-]+$', '', t1c_temp_path)
         print(">>>SAMPLE PATH : ", sample_path, " >>> \n")
         prediction_image = modelo_seg.obtener_segmentacion(sample_path=sample_path, slice_to_plot=20)
-
-        # Convierte la imagen en un archivo PNG
-        image_io = BytesIO()
-        plt.imsave(image_io, prediction_image, format='png')
-        image_io.seek(0)
-
-        response = HttpResponse(image_io, content_type='image/png')
-        response['Content-Disposition'] = 'attachment; filename="prediction.png"'
-
-        return response
+        print("salida>>")
+        print(prediction_image)
+        output_path = prediction_image
+        # Envía la imagen de vuelta al frontend
+        with open(output_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='image/png')
+            response['Content-Disposition'] = 'attachment; filename="prediction.png"'
+            return response
 
     return JsonResponse({'error': 'No se enviaron archivos.'}, status=400)
