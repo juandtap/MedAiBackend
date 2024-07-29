@@ -17,7 +17,7 @@ import requests
 from django.core.files.base import ContentFile
 
 ## Se exporta la APIKEY
-from apikey import API_KEY
+from .apikey import API_KEY
 
 API_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
 headers = {"Authorization": "Bearer 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"}
