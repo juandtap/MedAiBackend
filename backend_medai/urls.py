@@ -21,5 +21,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('brain_tumor_segmentation.urls')),
-    path('apiVoice/', include('speech_to_text_process.urls'))
+    path('apiVoice/', include('speech_to_text_process.urls')),
+
 ]

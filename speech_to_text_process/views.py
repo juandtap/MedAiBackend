@@ -1,11 +1,15 @@
 from django.shortcuts import render
 import os.path
 import re
+
 from django.conf import settings
 from rest_framework.decorators import api_view
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 from io import BytesIO
 import matplotlib.pyplot as plt
 from rest_framework.parsers import MultiPartParser
@@ -34,3 +38,51 @@ def subir_audio(request):
         return JsonResponse({'transcription': result['text']})
     else:
         return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+@api_view(['POST'])
+def chat_gpt(request):
+    try:
+        data = request.data
+        if not data or 'message' not in data:
+            return Response({'error': 'No message provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        message = data['message']
+
+        def chat_gpt_api(message):
+            try:
+                url = 'https://api.openai.com/v1/chat/completions'
+                headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer sk-None-pZvhT36Lo37E34AZP0ZZT3BlbkFJm5LRgULNtRF4ufYykAXu'
+                }
+                payload = {
+                    'model': 'gpt-3.5-turbo',
+                    'messages': [
+                        {
+                            'role': 'user',
+                            'content': message
+                        }
+                    ],
+                    'max_tokens': 200
+                }
+
+                response = requests.post(url, headers=headers, json=payload)
+
+                if response.status_code == 200:
+                    result = response.json()
+                    if 'choices' in result and result['choices']:
+                        return result['choices'][0]['message'].get('content', '').strip()
+                    else:
+                        return 'No se encontró una respuesta válida en la API'
+                else:
+                    return f'Error en la solicitud a la API: {response.status_code} - {response.text}'
+
+            except Exception as e:
+                return f'Error en la solicitud a la API: {str(e)}'
+
+        response_text = chat_gpt_api(message)
+        return Response({'response': response_text})
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
