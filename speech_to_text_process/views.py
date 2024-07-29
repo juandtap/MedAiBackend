@@ -15,7 +15,10 @@ import matplotlib.pyplot as plt
 from rest_framework.parsers import MultiPartParser
 import requests
 from django.core.files.base import ContentFile
-# Create your views here.
+
+## Se exporta la APIKEY
+from apikey import API_KEY
+
 API_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
 headers = {"Authorization": "Bearer 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"}
 
@@ -54,7 +57,7 @@ def chat_gpt(request):
                 url = 'https://api.openai.com/v1/chat/completions'
                 headers = {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer sk-None-pZvhT36Lo37E34AZP0ZZT3BlbkFJm5LRgULNtRF4ufYykAXu'
+                    'Authorization': 'Bearer '+API_KEY
                 }
                 payload = {
                     'model': 'gpt-3.5-turbo',
