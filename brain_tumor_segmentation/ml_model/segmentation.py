@@ -99,6 +99,9 @@ class ModeloSegmentacion:
         axstest.imshow(my_pred, cmap, norm)
         axstest.set_title('Predición')
 
+        # Ocultar los ejes
+        axstest.axis('off')
+
         plt.subplots_adjust(wspace=0.8)
         output_path = f'{sample_path}_prediction.png'
         plt.savefig(output_path)
