@@ -16,7 +16,10 @@ from rest_framework.parsers import MultiPartParser
 import requests
 from django.core.files.base import ContentFile
 
-## Se exporta la APIKEY
+# Se importa serializer
+from .serializer import PacienteSerializer
+
+## Se importa la APIKEY
 from .apikey import API_KEY
 
 API_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
@@ -89,3 +92,13 @@ def chat_gpt(request):
 
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def crear_paciente(request):
+    if request.method == 'POST':
+        serializer = PacienteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
