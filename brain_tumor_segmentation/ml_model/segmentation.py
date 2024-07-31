@@ -104,7 +104,7 @@ class ModeloSegmentacion:
         axstest.axis('off')
 
         # Crear la leyenda
-        legend_labels = ['núcleo tumoral necrótico (NCR)', 'tejido edematoso peritumoral (ED)', 'tumor realresaltado (ET)']
+        legend_labels = ['núcleo tumoral necrótico (NCR)', 'tejido edematoso peritumoral (ED)', 'tumor resaltado (ET)']
         legend_colors = ['#3b528b', '#18b880', '#e6d74f']
         patches = [mpatches.Patch(color=color, label=label) for color, label in zip(legend_colors, legend_labels)]
 
