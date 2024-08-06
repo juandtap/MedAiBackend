@@ -13,6 +13,8 @@ El proyecto de Django se divide en dos aplicaciones:
 
 #### Brain Tumor Segmentation
 
+[https://raw.githubusercontent.com/juandtap/MedAiBackend/voiceApi/screenshoots/app1.png](https://raw.githubusercontent.com/juandtap/MedAiBackend/voiceApi/screenshoots/app1.png)
+
 En esta aplicación se realiza la segmentación de tumores cerebrales a partir de la carga de archivos `.nii.gz` desde el frontend.
 Dentro de la aplicación se encuentra el directorio `ml_model` 
 
