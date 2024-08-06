@@ -1,7 +1,7 @@
 <hr color="#D2BA05">
 
-<font size="6" color="#195E87"><b><p align="center">Med Ai Assistant<p></b></font>
-<font size="3" color="#195E87"><b><p align="center">Alavarado Nixon - Astudillot Paul - Tapia Diego <p></b></font>
+<font size="9" color="#195E87"><b><p align="center">Med Ai Assistant<p></b></font>
+<font size="6" color="#195E87"><b><p align="center">Alavarado Nixon - Astudillot Paul - Tapia Diego <p></b></font>
 
 <hr  color="#D2BA05" >
 
