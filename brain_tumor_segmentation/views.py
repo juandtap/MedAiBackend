@@ -10,7 +10,10 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 from .ml_model.segmentation import ModeloSegmentacion
 from rest_framework.parsers import MultiPartParser
+import requests
+from django.core.files.base import ContentFile
 
+CORTE = 20
 
 @csrf_exempt
 @api_view(['POST'])
@@ -48,10 +51,22 @@ def cargar_imagen(request):
         modelo_seg = ModeloSegmentacion()
         sample_path = re.sub(r'-[^-]+$', '', t1c_temp_path)
         print(">>>SAMPLE PATH : ", sample_path, " >>> \n")
-        prediction_image = modelo_seg.obtener_segmentacion(sample_path=sample_path, slice_to_plot=20)
+        prediction_image = modelo_seg.obtener_segmentacion(sample_path=sample_path, slice_to_plot=CORTE)
         print("salida>>")
         print(prediction_image)
-        output_path = prediction_image
+
+        nii_path = sample_path+'-t2f.nii.gz'
+
+        # Número del corte axial que quieres mostrar
+        corte = 80
+
+        original_image = modelo_seg.obtener_original(nii_path, corte)
+
+        combined_image = modelo_seg.combinar_imagenes(original_image, prediction_image)
+
+        output_path = combined_image
+        print("path IMAGEN COMBINADA")
+        print(output_path)
         # Envía la imagen de vuelta al frontend
         with open(output_path, 'rb') as f:
             response = HttpResponse(f.read(), content_type='image/png')
