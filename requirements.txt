@@ -1,1 +1,2 @@
-
+se eliminan los requisitos debido a vulnerabilidades detectadas
+por el bot de github
